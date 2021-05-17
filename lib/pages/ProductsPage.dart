@@ -7,24 +7,19 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/state_manager.dart';
 import 'package:safeshopping/controllers/AuthController.dart';
 import 'package:safeshopping/controllers/ProductController.dart';
-import 'package:safeshopping/controllers/ShoppingCartController.dart';
 import 'package:safeshopping/controllers/UserController.dart';
-import 'package:safeshopping/pages/ProductPage.dart';
-import 'package:safeshopping/pages/ShoppingCartPage.dart';
-import 'package:safeshopping/pages/UserProfilePage.dart';
-import 'package:safeshopping/utils/NamedIcon.dart';
+import 'package:safeshopping/pages/AddNewProduct.dart';
+import 'package:safeshopping/pages/UpdateProductPage.dart';
 
-class SearchStore extends StatefulWidget {
+class ProductsPage extends StatefulWidget {
   @override
-  _SearchStoreState createState() => _SearchStoreState();
+  _ProductsPageState createState() => _ProductsPageState();
 }
 
-class _SearchStoreState extends State<SearchStore> {
+class _ProductsPageState extends State<ProductsPage> {
   final UserController userController = Get.put(UserController());
   final AuthController authController = AuthController();
   final ProductController productController = Get.put(ProductController());
-  final ShoppingCartController shoppingCartController =
-      Get.put(ShoppingCartController());
 
   final TextEditingController searchController = TextEditingController();
 
@@ -32,109 +27,32 @@ class _SearchStoreState extends State<SearchStore> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Safe Shopping"),
-        actions: <Widget>[
-          Obx(() => NamedIcon(
-                text: "Cart",
-                iconData: Icons.shopping_cart_rounded,
-                notificationCount: shoppingCartController.shoppingList.length,
-                onTap: () {
-                  Get.to(ShoppingCartPage());
-                },
-              ))
-        ],
-      ),
-      drawer: new Drawer(
-        child: ListView(
-          children: [
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
-              child: Container(
-                width: 110,
-                height: 110,
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  image: DecorationImage(
-                    image: AssetImage('assets/safe_shopping_logo.png'),
-                  ),
+        title: const Text("Products"),
+        centerTitle: true,
+        actions: [
+          OutlineButton(
+            onPressed: () {
+              Get.to(AddNewProductPage());
+            },
+            child: Row(
+              children: [
+                Text("Add New Product"),
+                SizedBox(
+                  width: 10,
                 ),
-              ),
+                Icon(Icons.inventory)
+              ],
             ),
-            BottomAppBar(
-              child: Row(
-                children: [
-                  FlatButton(
-                    child: Text("Logout"),
-                    onPressed: () {
-                      authController.signOut();
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const Divider(
-              height: 20,
-              thickness: 5,
-            ),
-          ],
-        ),
+          )
+        ],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              // onChanged: (val) {//Todo:method to search the products
-              //   searchMethod(val);
-              // },
-              controller: searchController,
-              style: TextStyle(
-                fontSize: 12,
-              ),
-              decoration: InputDecoration(
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search_rounded),
-                  onPressed: () {}, //ToDo: Product Search Method
-                ),
-                hintText: "Search Products",
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueGrey),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.lightBlue),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                OutlineButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
-                  child: Text(
-                    "Clear",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  onPressed: () {
-                    searchController.clear();
-                  },
-                ),
-              ],
-            ),
-          ),
           Container(), //Todo: return values are here
           Expanded(
             child: Obx(
               () => StaggeredGridView.countBuilder(
-                crossAxisCount: 2,
+                crossAxisCount: 4,
                 itemCount: productController.products.length,
                 crossAxisSpacing: 2,
                 mainAxisSpacing: 2,
@@ -143,7 +61,7 @@ class _SearchStoreState extends State<SearchStore> {
                     onTap: () {
                       print("Card Clicked" +
                           productController.products[index].productName);
-                      Get.to(ProductPage(), arguments: [
+                      Get.to(UpdateProductPage(), arguments: [
                         productController.products[index].imgString,
                         productController.products[index].productName,
                         productController.products[index].brandName,
@@ -180,12 +98,12 @@ class _SearchStoreState extends State<SearchStore> {
                               ),
                               Text(productController
                                   .products[index].productName),
-                              Text(productController
-                                  .products[index].productName),
+                              Text(productController.products[index].brandName),
                               SizedBox(
                                 height: 10,
                               ),
-                              Text(productController.products[index].price +
+                              Text(productController
+                                      .products[index].productQuantity +
                                   " " +
                                   productController
                                       .products[index].measurement),
@@ -245,9 +163,7 @@ class _SearchStoreState extends State<SearchStore> {
             IconButton(
                 iconSize: 30,
                 icon: const Icon(Icons.person),
-                onPressed: () {
-                  Get.to(Profile());
-                }), //ToDo: To User profile page
+                onPressed: () {}), //ToDo: To User profile page
           ],
         ),
       ),

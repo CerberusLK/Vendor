@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:safeshopping/models/User.dart';
 import 'package:safeshopping/services/FirestoreServices.dart';
-
 import 'UserController.dart';
 
 class AuthController extends GetxController {

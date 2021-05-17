@@ -38,8 +38,8 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "lk.cerberus.safeshopping"
-        minSdkVersion 23
+        applicationId "lk.cerberus.safeshopping_vendor"
+        minSdkVersion 22
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

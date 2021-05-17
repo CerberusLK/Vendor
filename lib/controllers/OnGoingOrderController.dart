@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:safeshopping/controllers/StoreController.dart';
 import 'package:safeshopping/models/Order.dart';
 import 'package:safeshopping/services/FirestoreServices.dart';
 
@@ -12,6 +13,7 @@ class OnGoingOrderController extends GetxController {
   void onInit() {
     super.onInit();
     String userId = Get.find<AuthController>().user.uid;
-    _onGoingOrderList.bindStream(FirestoreServices().getOngoingOrders(userId));
+    _onGoingOrderList.bindStream(FirestoreServices()
+        .getOngoingOrders(Get.find<StoreController>().selectedStore.value));
   }
 }

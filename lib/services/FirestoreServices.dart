@@ -1,8 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:safeshopping/controllers/CheckoutOrderController.dart';
-import 'package:safeshopping/controllers/CompletedOrderController.dart';
-import 'package:safeshopping/controllers/ShoppingCartController.dart';
 import 'package:safeshopping/models/CheckOutTotal.dart';
 import 'package:safeshopping/models/CheckoutOrder.dart';
 import 'package:safeshopping/models/Order.dart';
@@ -10,7 +7,7 @@ import 'package:safeshopping/models/Product.dart';
 import 'package:safeshopping/models/ShoppingCart.dart';
 import 'package:safeshopping/models/ShoppingCartTotal.dart';
 import 'package:safeshopping/models/User.dart';
-import 'package:safeshopping/utils/Scanner.dart';
+import 'package:safeshopping/models/store.dart';
 
 class FirestoreServices extends GetxController {
   Firestore _db = Firestore.instance;
@@ -23,7 +20,7 @@ class FirestoreServices extends GetxController {
 
   Future<bool> createNewUser(UserModel user) async {
     try {
-      await _db.collection("Customer").document(user.id).setData({
+      await _db.collection("Vendor").document(user.id).setData({
         "name": user.name,
         "email": user.email,
         "totalCartPrice": "0",
@@ -38,8 +35,7 @@ class FirestoreServices extends GetxController {
 
   Future<UserModel> getUser(String uid) async {
     try {
-      DocumentSnapshot doc =
-          await _db.collection("Customer").document(uid).get();
+      DocumentSnapshot doc = await _db.collection("Vendor").document(uid).get();
       UserModel _userModel = UserModel.fromDocumentSnapshot(doc);
       print(_userModel.id);
       print(_userModel.name);
@@ -118,10 +114,10 @@ class FirestoreServices extends GetxController {
     });
   }
 
-  Stream<List<OrderModel>> getOngoingOrders(String userId) {
+  Stream<List<OrderModel>> getOngoingOrders(String storeId) {
     return _db
-        .collection("Customer")
-        .document(userId)
+        .collection("Stores")
+        .document("g47iC3QAFnm4okLCTS6I")
         .collection("OngoingOrders")
         .snapshots()
         .map((QuerySnapshot querySnapshot) {
@@ -159,6 +155,20 @@ class FirestoreServices extends GetxController {
       List<OrderModel> retVal = List();
       querySnapshot.documents.forEach((element) {
         retVal.add(OrderModel.fromDocumentSnapshot(element));
+      });
+      return retVal;
+    });
+  }
+
+  Stream<List<StoreModel>> getUserStores(String vendorId) {
+    return _db
+        .collection("Stores")
+        .where("Store Owner Id", isEqualTo: vendorId)
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      List<StoreModel> retVal = List();
+      querySnapshot.documents.forEach((element) {
+        retVal.add(StoreModel.fromDocumentSnapshot(element));
       });
       return retVal;
     });
@@ -217,6 +227,76 @@ class FirestoreServices extends GetxController {
     }
   }
 
+  Future<void> createNewStore(
+    String vendorId,
+    String city,
+    String name,
+    String ownerId,
+    String phone,
+    String photo,
+  ) async {
+    try {
+      await _db
+          .collection("Vendor")
+          .document(vendorId)
+          .collection("Stores")
+          .add({
+        "Store City": city,
+        "Store Name": name,
+        "Store Owner Id": ownerId,
+        "Store Phone": phone,
+        "Store Photo": photo,
+      });
+      await _db.collection("Stores").add({
+        "Store City": city,
+        "Store Name": name,
+        "Store Owner Id": ownerId,
+        "Store Phone": phone,
+        "Store Photo": photo,
+      });
+      Get.snackbar("Success", "Store Created Successfully");
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> addProduct(
+      String vendorId,
+      String storeId,
+      String brandName,
+      String imgString,
+      String measurement,
+      String price,
+      String productName,
+      String quantity) async {
+    await _db
+        .collection("Vendor")
+        .document(vendorId)
+        .collection("Stores")
+        .document(storeId)
+        .collection("Products")
+        .add({
+      "brandName": brandName,
+      "imgString": imgString,
+      "measurement": measurement,
+      "price": price,
+      "productName": productName,
+      "quantity": quantity,
+      "storeId": storeId,
+    });
+    await _db.collection("Products").add({
+      "brandName": brandName,
+      "imgString": imgString,
+      "measurement": measurement,
+      "price": price,
+      "productName": productName,
+      "quantity": quantity,
+      "storeId": storeId,
+    });
+    Get.snackbar("Success", "Product added successfuly");
+  }
+
   Future<void> addToShoppingCart(String customerId, String storeId,
       String productId, String quantity, String price) async {
     ShoppingCartModel item = await getShoppingCartItem(productId, customerId);
@@ -261,36 +341,6 @@ class FirestoreServices extends GetxController {
       Get.snackbar("Success", "Item added to the cart");
     } catch (e) {
       Get.snackbar("Failed", "Item failed to add to the cart");
-      rethrow;
-    }
-  }
-
-  Future<void> createTheOrder(String userId) async {
-    try {
-      List<ShoppingCartModel> orderItems =
-          Get.find<ShoppingCartController>().shoppingList;
-      orderItems.forEach((element) async {
-        await _db
-            .collection("Customer")
-            .document(userId)
-            .collection("OngoingOrders")
-            .add({
-          'customerId': userId,
-          'storeId': element.storeId,
-          'unitPrice': element.price,
-          'qty': element.quantity,
-          'productId': element.productId,
-          'dateCreated': Timestamp.now(),
-          'isCompleted': "false",
-          'status': 'in review',
-        });
-        Get.snackbar("Success", "Order created successfully");
-        //TODO:add method to add order to store
-        deleteItemFromShoppingCart(userId, element.productId,
-            int.parse(element.quantity), int.parse(element.price));
-      });
-    } catch (e) {
-      print(e);
       rethrow;
     }
   }
@@ -395,59 +445,6 @@ class FirestoreServices extends GetxController {
         .document(orderId)
         .delete();
     Get.snackbar("Success", "Order removed successfully");
-  }
-
-  Future<void> collectOrderFromStore() async {
-    try {
-      int total = 0;
-      String storeId = await Scanner().scanQrCode();
-      List<OrderModel> orderList =
-          Get.find<CompletedOrderController>().orderList;
-      orderList.forEach((element) async {
-        ProductModel product = await getProduct(element.productId);
-        if (element.storeId == storeId) {
-          _db
-              .collection("Stores")
-              .document(storeId)
-              .collection("AwaitingOrders")
-              .document(element.orderId)
-              .setData({
-            "productId": element.productId,
-            "quantity": element.qty,
-            "customerId": element.customerId,
-            "dateCreated": element.dateCreated,
-          });
-          _db
-              .collection("Customer")
-              .document(element.customerId)
-              .collection("CheckoutOrders")
-              .document(element.orderId)
-              .setData({
-            "productId": element.productId,
-            "quantity": element.qty,
-            "customerId": element.customerId,
-            "dateCreated": element.dateCreated,
-            "productName": product.productName,
-            "productBrand": product.brandName,
-            "unitPrice": element.unitPrice,
-          });
-          total += element.qty * element.unitPrice;
-          CheckOutTotalModel checkOutTotalModel =
-              await getCheckOutTotal(element.customerId);
-          await _db
-              .collection("Customer")
-              .document(element.customerId)
-              .updateData({
-            "totalCheckout":
-                (int.parse(checkOutTotalModel.totalCheckout) + total)
-                    .toString(),
-          });
-        }
-      });
-    } catch (e) {
-      print(e);
-      rethrow;
-    }
   }
 
 // Future<List<ProductModel>> getProducts() async {

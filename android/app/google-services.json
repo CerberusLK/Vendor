@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:888267475966:android:b90ee546becf6204a94eaf",
+        "mobilesdk_app_id": "1:888267475966:android:0ddfebf0bb6d4acfa94eaf",
         "android_client_info": {
-          "package_name": "lk.cerberus.safe_shopping"
+          "package_name": "lk.cerberus.safe_shopping_vendor"
         }
       },
       "oauth_client": [
@@ -40,6 +40,35 @@
         "mobilesdk_app_id": "1:888267475966:android:9b72d1dce789a567a94eaf",
         "android_client_info": {
           "package_name": "lk.cerberus.safeshopping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "888267475966-3r1ou6af2vs999pi2he89pbqcmcv1d7n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQjQvGi3mreiZ7hzPmqaP_ajvTS9M_hM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "888267475966-3r1ou6af2vs999pi2he89pbqcmcv1d7n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888267475966:android:13d9327cca2e8287a94eaf",
+        "android_client_info": {
+          "package_name": "lk.cerberus.safeshopping_vendor"
         }
       },
       "oauth_client": [

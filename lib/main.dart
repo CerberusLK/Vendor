@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-//TODO: delete completed corders on checkout
-//TODO: implement the product search
-//TODO: implement the local notification when order status changed to complete
-//TODO: add a rating system
+//TODO: add method to show selected store
+//TODO: 
+//TODO: 
+//TODO: 

@@ -24,7 +24,7 @@ class OrderModel {
   );
 
   OrderModel.fromDocumentSnapshot(DocumentSnapshot documentSnapshot) {
-    orderId = documentSnapshot.data["orderId"];
+    orderId = documentSnapshot.documentID;
     customerId = documentSnapshot.data["customerId"];
     storeId = documentSnapshot.data["storeId"];
     dateCreated = documentSnapshot.data["dateCreated"];
