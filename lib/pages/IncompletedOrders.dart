@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:safeshopping/controllers/AcceptedOrderController.dart';
+import 'package:safeshopping/controllers/StoreController.dart';
 import 'package:safeshopping/models/Product.dart';
 import 'package:safeshopping/services/FirestoreServices.dart';
 
@@ -82,7 +83,15 @@ class _IncompletedOrderPageState extends State<IncompletedOrderPage> {
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(20)),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            FirestoreServices()
+                                                .markAsReadyToCollect(
+                                                    Get.find<StoreController>()
+                                                        .selectedStore
+                                                        .value,
+                                                    orders.orderList[index]
+                                                        .orderId);
+                                          },
                                           child: Row(
                                             children: [
                                               Text("Mark As Completed"),

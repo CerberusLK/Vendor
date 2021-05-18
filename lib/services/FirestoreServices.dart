@@ -236,6 +236,29 @@ class FirestoreServices extends GetxController {
     }
   }
 
+  Future<List> getSpecificAcceptedOrder(String storeId, String orderId) async {
+    List returnVal = [];
+    try {
+      DocumentSnapshot doc = await _db
+          .collection("Stores")
+          .document(storeId)
+          .collection("AcceptedOrders")
+          .document(orderId)
+          .get();
+      if (doc.exists) {
+        returnVal.add(doc.documentID.toString());
+        OrderModel orderModel = OrderModel.fromDocumentSnapshot(doc);
+        returnVal.add(orderModel);
+        return returnVal;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<ShoppingCartTotalModel> getShoppingCartTotal(String customerId) async {
     try {
       DocumentSnapshot doc =
@@ -434,6 +457,58 @@ class FirestoreServices extends GetxController {
           'totalCartPrice': (int.parse(total.totalPrice) - price).toString()
         });
       }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> markAsReadyToCollect(String storeId, String orderId) async {
+    try {
+      List values = await getSpecificAcceptedOrder(storeId, orderId);
+      OrderModel selectedOrder = values[1];
+      await _db
+          .collection("Stores")
+          .document(storeId)
+          .collection("ReadyToCollect")
+          .document(orderId)
+          .setData({
+        "customerId": selectedOrder.customerId,
+        "dateCreated": selectedOrder.dateCreated,
+        "isCompleted": "true",
+        "productId": selectedOrder.productId,
+        "qty": selectedOrder.qty.toString(),
+        "status": "Ready To Collect",
+        "storeId": selectedOrder.storeId,
+        "unitPrice": selectedOrder.unitPrice.toString(),
+      });
+      await _db
+          .collection("Customer")
+          .document(selectedOrder.customerId)
+          .collection("ReadyToCollect")
+          .document(orderId)
+          .setData({
+        "customerId": selectedOrder.customerId,
+        "dateCreated": selectedOrder.dateCreated,
+        "isCompleted": "true",
+        "productId": selectedOrder.productId,
+        "qty": selectedOrder.qty.toString(),
+        "status": "Ready To Collect",
+        "storeId": selectedOrder.storeId,
+        "unitPrice": selectedOrder.unitPrice.toString(),
+      });
+      await _db
+          .collection("Customer")
+          .document(selectedOrder.customerId)
+          .collection("AcceptedOrders")
+          .document(values[0])
+          .delete();
+      await _db
+          .collection("Stores")
+          .document(storeId)
+          .collection("AcceptedOrders")
+          .document(values[0])
+          .delete();
     } catch (e) {
       print(e);
       rethrow;
