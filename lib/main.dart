@@ -21,6 +21,6 @@ class MyApp extends StatelessWidget {
 }
 
 //TODO: add method to show selected store
-//TODO: 
-//TODO: 
-//TODO: 
+//TODO: need to set main screen to select store
+//TODO: add vendor order reject message
+//TODO: add method to get customer data

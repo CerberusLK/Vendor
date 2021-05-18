@@ -52,7 +52,7 @@ class UserLogin extends GetWidget<AuthController> {
                         padding: const EdgeInsets.only(top: 25.0, left: 10.0),
                         child: Container(
                           //color: Colors.green,
-                          height: 200,
+                          height: 250,
                           width: 200,
                           child: Column(
                             children: <Widget>[

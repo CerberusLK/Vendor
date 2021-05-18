@@ -35,6 +35,7 @@ dependencies:
   flutter_staggered_grid_view: ^0.3.2
   flutter_barcode_scanner: ^1.0.1
   image_picker: ^0.6.7+22
+  uuid: ^3.0.4
 
 dev_dependencies:
   flutter_test:

@@ -162,6 +162,22 @@ class FirestoreServices extends GetxController {
     });
   }
 
+  Stream<List<OrderModel>> getAcceptedOrders(String storeId) {
+    return _db
+        .collection("Stores")
+        .document(storeId)
+        .collection("AcceptedOrders")
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      List<OrderModel> retVal = List();
+      querySnapshot.documents.forEach((element) {
+        retVal.add(OrderModel.fromDocumentSnapshot(element));
+      });
+      print("accepted order length = " + retVal.length.toString());
+      return retVal;
+    });
+  }
+
   Stream<List<StoreModel>> getUserStores(String vendorId) {
     return _db
         .collection("Stores")
@@ -436,12 +452,12 @@ class FirestoreServices extends GetxController {
           .setData({
         "customerId": selectedOrder.customerId,
         "dateCreated": selectedOrder.dateCreated,
-        "isCompleted": selectedOrder.isCompleted,
+        "isCompleted": selectedOrder.isCompleted.toString(),
         "productId": selectedOrder.productId,
-        "qty": selectedOrder.qty,
+        "qty": selectedOrder.qty.toString(),
         "status": "Accepted",
         "storeId": selectedOrder.storeId,
-        "unitPrice": selectedOrder.unitPrice,
+        "unitPrice": selectedOrder.unitPrice.toString(),
       });
       await _db
           .collection("Customer")
@@ -451,12 +467,12 @@ class FirestoreServices extends GetxController {
           .setData({
         "customerId": selectedOrder.customerId,
         "dateCreated": selectedOrder.dateCreated,
-        "isCompleted": selectedOrder.isCompleted,
+        "isCompleted": selectedOrder.isCompleted.toString(),
         "productId": selectedOrder.productId,
-        "qty": selectedOrder.qty,
+        "qty": selectedOrder.qty.toString(),
         "status": "Accepted",
         "storeId": selectedOrder.storeId,
-        "unitPrice": selectedOrder.unitPrice,
+        "unitPrice": selectedOrder.unitPrice.toString(),
       });
       await _db
           .collection("Customer")

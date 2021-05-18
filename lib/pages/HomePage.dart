@@ -9,6 +9,7 @@ import 'package:safeshopping/controllers/StoreController.dart';
 import 'package:safeshopping/controllers/OnGoingOrderController.dart';
 import 'package:safeshopping/models/Product.dart';
 import 'package:safeshopping/pages/CreateStore.dart';
+import 'package:safeshopping/pages/IncompletedOrders.dart';
 import 'package:safeshopping/pages/ProductsPage.dart';
 import 'package:safeshopping/services/FirestoreServices.dart';
 
@@ -28,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Home"),
+          title: Text("Dashboard"),
           centerTitle: true,
         ),
         drawer: Drawer(
@@ -176,14 +177,21 @@ class _HomePageState extends State<HomePage> {
                       child: Container(
                         child: Column(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Customers Waiting for Collecting Orders",
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ],
+                            Container(
+                              height: 40,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Customers Waiting for Collecting Orders",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -229,50 +237,6 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Card(
-                                elevation: 10,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [Text("Lakshan Wijesooriya")],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Text("Item Count :"),
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [Text("4")],
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Text("Checkout Total :"),
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [Text("Rs.1100.00")],
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                         color: Colors.yellow,
@@ -282,14 +246,20 @@ class _HomePageState extends State<HomePage> {
                       child: Container(
                         child: Column(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Selected Customer Orders",
-                                  style: TextStyle(fontSize: 16),
-                                )
-                              ],
+                            Container(
+                              height: 50,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Selected Customer Orders",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
                             ),
                             Row(
                               children: [
@@ -362,9 +332,38 @@ class _HomePageState extends State<HomePage> {
             ),
             Container(
               height: 50,
-              child: Text(
-                "Orders waiting to be Accepted",
-                style: TextStyle(fontSize: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Orders waiting to be Accepted",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      RaisedButton(
+                          color: Colors.greenAccent,
+                          elevation: 20,
+                          child: Row(
+                            children: [
+                              Text("To Accepted Orders"),
+                              SizedBox(width: 40),
+                              Icon(Icons.shopping_basket)
+                            ],
+                          ),
+                          onPressed: () {
+                            Get.to(IncompletedOrderPage());
+                          })
+                    ],
+                  )
+                ],
               ),
             ),
             Expanded(
@@ -387,16 +386,6 @@ class _HomePageState extends State<HomePage> {
                                     children: [
                                       Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          IconButton(
-                                              color: Colors.red,
-                                              icon: Icon(Icons.close),
-                                              onPressed: () {})
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Column(
@@ -406,11 +395,54 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Column(
                                             children: [
-                                              Checkbox(
-                                                  value: isAccepted,
-                                                  onChanged: (bool value) {
-                                                    isAccepted = value;
-                                                  })
+                                              Row(
+                                                children: [
+                                                  IconButton(
+                                                      color: Colors.red,
+                                                      icon: Icon(Icons.close),
+                                                      onPressed: () {
+                                                        Get.defaultDialog(
+                                                            title: "Warning",
+                                                            middleText:
+                                                                "This order will be rejected",
+                                                            textConfirm:
+                                                                "Confirm",
+                                                            textCancel:
+                                                                "Cancel",
+                                                            onCancel: () {
+                                                              Get.back();
+                                                            },
+                                                            onConfirm: () {
+                                                              FirestoreServices().rejectOngoingOrderStatus(
+                                                                  _store
+                                                                      .selectedStore
+                                                                      .value,
+                                                                  onGoingOrderController
+                                                                      .orderList[
+                                                                          index]
+                                                                      .orderId);
+                                                            });
+                                                      }),
+                                                  SizedBox(
+                                                    width: 50,
+                                                  ),
+                                                  IconButton(
+                                                      color: Colors.green,
+                                                      icon: Icon(Icons.done),
+                                                      onPressed: () {
+                                                        FirestoreServices()
+                                                            .acceptOngoingOrderStatus(
+                                                                _store
+                                                                    .selectedStore
+                                                                    .value,
+                                                                onGoingOrderController
+                                                                    .orderList[
+                                                                        index]
+                                                                    .orderId);
+                                                        Get.back();
+                                                      }),
+                                                ],
+                                              ),
                                             ],
                                           )
                                         ],
