@@ -4,6 +4,7 @@ import 'package:safeshopping/models/CheckOutTotal.dart';
 import 'package:safeshopping/models/CheckoutOrder.dart';
 import 'package:safeshopping/models/Order.dart';
 import 'package:safeshopping/models/Product.dart';
+import 'package:safeshopping/models/SelectedCustomer.dart';
 import 'package:safeshopping/models/ShoppingCart.dart';
 import 'package:safeshopping/models/ShoppingCartTotal.dart';
 import 'package:safeshopping/models/User.dart';
@@ -147,6 +148,21 @@ class FirestoreServices extends GetxController {
     });
   }
 
+  Stream<List<OrderModel>> getAwaitingOrders(String storeId) {
+    return _db
+        .collection("Stores")
+        .document(storeId)
+        .collection("AwaitingOrders")
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      List<OrderModel> retVal = List();
+      querySnapshot.documents.forEach((element) {
+        retVal.add(OrderModel.fromDocumentSnapshot(element));
+      });
+      return retVal;
+    });
+  }
+
   Stream<List<OrderModel>> getCompletedOrders(String userId) {
     return _db
         .collection("Customer")
@@ -157,6 +173,21 @@ class FirestoreServices extends GetxController {
       List<OrderModel> retVal = List();
       querySnapshot.documents.forEach((element) {
         retVal.add(OrderModel.fromDocumentSnapshot(element));
+      });
+      return retVal;
+    });
+  }
+
+  Stream<List<SelectedCustomerModel>> getAwaitingCustomers(String storeId) {
+    return _db
+        .collection("Stores")
+        .document(storeId)
+        .collection("AwaitingCustomers")
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      List<SelectedCustomerModel> retVal = List();
+      querySnapshot.documents.forEach((element) {
+        retVal.add(SelectedCustomerModel.fromDocumentSnapshot(element));
       });
       return retVal;
     });
@@ -174,6 +205,21 @@ class FirestoreServices extends GetxController {
         retVal.add(OrderModel.fromDocumentSnapshot(element));
       });
       print("accepted order length = " + retVal.length.toString());
+      return retVal;
+    });
+  }
+
+  Stream<List<SelectedCustomerModel>> getAwaitingCuatomers(String storeId) {
+    return _db
+        .collection("Stores")
+        .document(storeId)
+        .collection("AwaitingCustomers")
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      List<SelectedCustomerModel> retVal = List();
+      querySnapshot.documents.forEach((element) {
+        retVal.add(SelectedCustomerModel.fromDocumentSnapshot(element));
+      });
       return retVal;
     });
   }

@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:safeshopping/controllers/AuthController.dart';
+import 'package:safeshopping/controllers/AwaitingCustomersController.dart';
+import 'package:safeshopping/controllers/AwaitingOrderController.dart';
 import 'package:safeshopping/controllers/ProductController.dart';
 import 'package:safeshopping/controllers/StoreController.dart';
 import 'package:safeshopping/controllers/OnGoingOrderController.dart';
 import 'package:safeshopping/models/Product.dart';
-import 'package:safeshopping/pages/CreateStore.dart';
 import 'package:safeshopping/pages/IncompletedOrders.dart';
 import 'package:safeshopping/pages/ProductsPage.dart';
+import 'package:safeshopping/pages/StoreSelector.dart';
 import 'package:safeshopping/services/FirestoreServices.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,6 +26,10 @@ class _HomePageState extends State<HomePage> {
   final ProductController productController = Get.put(ProductController());
   final OnGoingOrderController onGoingOrderController =
       Get.put(OnGoingOrderController());
+  final AwaitingOrderController awaitingOrderController =
+      Get.put(AwaitingOrderController());
+  final AwaitingCustomerController awaitingCustomerController =
+      Get.put(AwaitingCustomerController());
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -134,12 +140,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                     RaisedButton(
                       onPressed: () {
-                        Get.to(() => CreateStorePage());
+                        Get.to(() => StoreSelectorPage());
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Create Store"),
+                          Text("Select A different Store"),
                           Icon(Icons.store_mall_directory_outlined),
                         ],
                       ),
@@ -193,50 +199,79 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Card(
-                                elevation: 10,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [Text("Chathura Prabasha")],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Text("Item Count :"),
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [Text("2")],
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Text("Checkout Total :"),
-                                            ],
-                                          ),
-                                          Column(
-                                            children: [Text("Rs.500.00")],
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                            Expanded(
+                                child: Obx(() => InkWell(
+                                      onTap: () {},
+                                      child: StaggeredGridView.countBuilder(
+                                          crossAxisCount: 1,
+                                          itemCount: awaitingCustomerController
+                                              .customer.length,
+                                          itemBuilder: (contextt, index) {
+                                            return Card(
+                                              elevation: 10,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                            awaitingCustomerController
+                                                                .customer[index]
+                                                                .customerId)
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Column(
+                                                          children: [
+                                                            Text(
+                                                                "Item Count :"),
+                                                          ],
+                                                        ),
+                                                        Column(
+                                                          children: [
+                                                            Text(
+                                                                awaitingCustomerController
+                                                                    .customer[
+                                                                        index]
+                                                                    .itemCount)
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Column(
+                                                          children: [
+                                                            Text(
+                                                                "Checkout Total :"),
+                                                          ],
+                                                        ),
+                                                        Column(
+                                                          children: [
+                                                            Text(awaitingCustomerController
+                                                                .customer[index]
+                                                                .checkoutTotal)
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          staggeredTileBuilder: (index) =>
+                                              StaggeredTile.fit(1)),
+                                    ))),
                           ],
                         ),
                         color: Colors.yellow,
