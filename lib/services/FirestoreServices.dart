@@ -8,9 +8,11 @@ import 'package:safeshopping/models/ShoppingCart.dart';
 import 'package:safeshopping/models/ShoppingCartTotal.dart';
 import 'package:safeshopping/models/User.dart';
 import 'package:safeshopping/models/store.dart';
+import 'package:uuid/uuid.dart';
 
 class FirestoreServices extends GetxController {
   Firestore _db = Firestore.instance;
+  var uuid = Uuid();
 
   Future getData(String collection) async {
     QuerySnapshot snapshot =
@@ -189,6 +191,29 @@ class FirestoreServices extends GetxController {
         return _shoppingCartModel;
       } else
         return null;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<List> getSpecificOngoingOrder(String storeId, String orderId) async {
+    List returnVal = [];
+    try {
+      DocumentSnapshot doc = await _db
+          .collection("Stores")
+          .document(storeId)
+          .collection("OngoingOrders")
+          .document(orderId)
+          .get();
+      if (doc.exists) {
+        returnVal.add(doc.documentID.toString());
+        OrderModel orderModel = OrderModel.fromDocumentSnapshot(doc);
+        returnVal.add(orderModel);
+        return returnVal;
+      } else {
+        return null;
+      }
     } catch (e) {
       print(e);
       rethrow;
@@ -393,6 +418,95 @@ class FirestoreServices extends GetxController {
           'totalCartPrice': (int.parse(total.totalPrice) - price).toString()
         });
       }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> acceptOngoingOrderStatus(String storeId, String orderId) async {
+    try {
+      List values = await getSpecificOngoingOrder(storeId, orderId);
+      OrderModel selectedOrder = values[1];
+      await _db
+          .collection("Stores")
+          .document(storeId)
+          .collection("AcceptedOrders")
+          .document(orderId)
+          .setData({
+        "customerId": selectedOrder.customerId,
+        "dateCreated": selectedOrder.dateCreated,
+        "isCompleted": selectedOrder.isCompleted,
+        "productId": selectedOrder.productId,
+        "qty": selectedOrder.qty,
+        "status": "Accepted",
+        "storeId": selectedOrder.storeId,
+        "unitPrice": selectedOrder.unitPrice,
+      });
+      await _db
+          .collection("Customer")
+          .document(selectedOrder.customerId)
+          .collection("AcceptedOrders")
+          .document(orderId)
+          .setData({
+        "customerId": selectedOrder.customerId,
+        "dateCreated": selectedOrder.dateCreated,
+        "isCompleted": selectedOrder.isCompleted,
+        "productId": selectedOrder.productId,
+        "qty": selectedOrder.qty,
+        "status": "Accepted",
+        "storeId": selectedOrder.storeId,
+        "unitPrice": selectedOrder.unitPrice,
+      });
+      await _db
+          .collection("Customer")
+          .document(selectedOrder.customerId)
+          .collection("OngoingOrders")
+          .document(values[0])
+          .delete();
+      await _db
+          .collection("Stores")
+          .document(storeId)
+          .collection("OngoingOrders")
+          .document(values[0])
+          .delete();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> rejectOngoingOrderStatus(String storeId, String orderId) async {
+    try {
+      List values = await getSpecificOngoingOrder(storeId, orderId);
+      OrderModel selectedOrder = values[1];
+      await _db
+          .collection("Customer")
+          .document(selectedOrder.customerId)
+          .collection("RejectedOrders")
+          .document(orderId)
+          .setData({
+        "customerId": selectedOrder.customerId,
+        "dateCreated": selectedOrder.dateCreated,
+        "isCompleted": selectedOrder.isCompleted,
+        "productId": selectedOrder.productId,
+        "qty": selectedOrder.qty,
+        "status": "Rejected",
+        "storeId": selectedOrder.storeId,
+        "unitPrice": selectedOrder.unitPrice,
+      });
+      await _db
+          .collection("Customer")
+          .document(selectedOrder.customerId)
+          .collection("OngoingOrders")
+          .document(values[0])
+          .delete();
+      await _db
+          .collection("Stores")
+          .document(storeId)
+          .collection("OngoingOrders")
+          .document(values[0])
+          .delete();
     } catch (e) {
       print(e);
       rethrow;
