@@ -7,6 +7,8 @@ class AwaitingCustomerController extends GetxController {
   Rx<List<SelectedCustomerModel>> _customer = Rx<List<SelectedCustomerModel>>();
   List<SelectedCustomerModel> get customer => _customer.value;
 
+  var customerId = "".obs;
+
   @override
   void onInit() {
     _customer.bindStream(FirestoreServices()

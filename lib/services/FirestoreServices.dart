@@ -144,6 +144,7 @@ class FirestoreServices extends GetxController {
       querySnapshot.documents.forEach((element) {
         retVal.add(CheckoutOrderModel.fromDocumentSnapshot(element));
       });
+      print("checkout count is :" + retVal.length.toString());
       return retVal;
     });
   }
