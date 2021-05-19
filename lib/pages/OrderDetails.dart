@@ -14,6 +14,7 @@ class OrderDetailsPage extends StatefulWidget {
 
 class _OrderDetailsPageState extends State<OrderDetailsPage> {
   final CheckoutController checkoutController = Get.put(CheckoutController());
+  var args = Get.arguments;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +24,103 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       ),
       body: Column(
         children: [
+          BottomAppBar(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.local_offer_rounded),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                "Number of Items : ",
+                                style: TextStyle(fontSize: 16),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            args[0],
+                            style: TextStyle(fontSize: 16),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.payment),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                "Total Bill Value : ",
+                                style: TextStyle(fontSize: 16),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            "Rs." + args[1] + ".00",
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        height: 50,
+                        child: RaisedButton(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          color: Colors.green,
+                          onPressed: () {},
+                          child: Row(
+                            children: [
+                              Text("Complete The Order"),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Icon(Icons.done_rounded)
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: Obx(
               () => StaggeredGridView.countBuilder(

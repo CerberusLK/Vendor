@@ -62,6 +62,18 @@ class FirestoreServices extends GetxController {
     }
   }
 
+  Future<UserModel> getCustomerName(String customerId) async {
+    try {
+      DocumentSnapshot doc =
+          await _db.collection("Customer").document(customerId).get();
+      UserModel userModel = UserModel.fromDocumentSnapshot(doc);
+      return userModel;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Stream<List<ProductModel>> productStream() {
     return _db
         .collection("Products")

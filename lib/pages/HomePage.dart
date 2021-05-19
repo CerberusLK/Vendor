@@ -12,6 +12,7 @@ import 'package:safeshopping/controllers/StoreController.dart';
 import 'package:safeshopping/controllers/OnGoingOrderController.dart';
 import 'package:safeshopping/models/Order.dart';
 import 'package:safeshopping/models/Product.dart';
+import 'package:safeshopping/models/User.dart';
 import 'package:safeshopping/pages/IncompletedOrders.dart';
 import 'package:safeshopping/pages/OrderDetails.dart';
 import 'package:safeshopping/pages/ProductsPage.dart';
@@ -208,78 +209,100 @@ class _HomePageState extends State<HomePage> {
                                     crossAxisCount: 1,
                                     itemCount: awaitingCustomerController
                                         .customer.length,
-                                    itemBuilder: (contextt, index) {
-                                      return InkWell(
-                                        onTap: () {
-                                          awaitingCustomerController
-                                                  .customerId.value =
-                                              awaitingCustomerController
-                                                  .customer[index].customerId;
-                                          print("customer selected " +
-                                              awaitingCustomerController
-                                                  .customer[index].customerId);
-                                          Get.to(() => OrderDetailsPage());
-                                        },
-                                        child: Card(
-                                          elevation: 10,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Text(
+                                    itemBuilder: (context, index) {
+                                      return FutureBuilder<UserModel>(
+                                          future: FirestoreServices()
+                                              .getCustomerName(
+                                                  awaitingCustomerController
+                                                      .customer[index]
+                                                      .customerId),
+                                          builder: (context, userModel) {
+                                            if (userModel.hasData) {
+                                              return InkWell(
+                                                onTap: () {
+                                                  awaitingCustomerController
+                                                          .customerId.value =
+                                                      awaitingCustomerController
+                                                          .customer[index]
+                                                          .customerId;
+                                                  print("customer selected " +
+                                                      userModel.data.name);
+                                                  Get.to(
+                                                      () => OrderDetailsPage(),
+                                                      arguments: [
                                                         awaitingCustomerController
                                                             .customer[index]
-                                                            .customerId)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
+                                                            .itemCount,
+                                                        awaitingCustomerController
+                                                            .customer[index]
+                                                            .checkoutTotal
+                                                      ]);
+                                                },
+                                                child: Card(
+                                                  elevation: 10,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    child: Column(
                                                       children: [
-                                                        Text("Item Count :"),
+                                                        Row(
+                                                          children: [
+                                                            Text(userModel
+                                                                .data.name)
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Column(
+                                                              children: [
+                                                                Text(
+                                                                    "Item Count :"),
+                                                              ],
+                                                            ),
+                                                            Column(
+                                                              children: [
+                                                                Text(awaitingCustomerController
+                                                                    .customer[
+                                                                        index]
+                                                                    .itemCount)
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Column(
+                                                              children: [
+                                                                Text(
+                                                                    "Checkout Total :"),
+                                                              ],
+                                                            ),
+                                                            Column(
+                                                              children: [
+                                                                Text(awaitingCustomerController
+                                                                    .customer[
+                                                                        index]
+                                                                    .checkoutTotal)
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
                                                       ],
                                                     ),
-                                                    Column(
-                                                      children: [
-                                                        Text(
-                                                            awaitingCustomerController
-                                                                .customer[index]
-                                                                .itemCount)
-                                                      ],
-                                                    )
-                                                  ],
+                                                  ),
                                                 ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      children: [
-                                                        Text(
-                                                            "Checkout Total :"),
-                                                      ],
-                                                    ),
-                                                    Column(
-                                                      children: [
-                                                        Text(
-                                                            awaitingCustomerController
-                                                                .customer[index]
-                                                                .checkoutTotal)
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
+                                              );
+                                            } else {
+                                              return Text("Loading...");
+                                            }
+                                          });
                                     },
                                     staggeredTileBuilder: (index) =>
                                         StaggeredTile.fit(1)))),
